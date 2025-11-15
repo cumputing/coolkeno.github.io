@@ -5,476 +5,288 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cool Keno Game</title>
 <style>
-    body {
-        font-family: 'Arial', sans-serif;
-        background: radial-gradient(circle at top left, #0d0d1f, #1a1a2e, #162447, #0d0d1f);
-        color: #fff;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 20px;
-        min-height: 100vh;
-        margin: 0;
-        background-size: cover;
-        animation: bgPulse 10s infinite alternate;
-    }
-
-    @keyframes bgPulse {
-        0% { background-position: top left; }
-        50% { background-position: center; }
-        100% { background-position: bottom right; }
-    }
-
-    h1 {
-        margin-bottom: 10px;
-        color: #f5a623;
-        text-shadow: 2px 2px 6px #000;
-    }
-
-    #keno-board {
-        display: grid;
-        /* --- FIXED: 8 columns for standard 80-number board --- */
-        grid-template-columns: repeat(8, 50px);
-        grid-gap: 5px;
-        margin: 20px 0;
-    }
-
-    .cell {
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(145deg, #162447, #0d0d1f);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.3s;
-        user-select: none;
-        position: relative;
-        font-weight: bold;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-    }
-
-    .cell.selected {
-        background: #f5a623;
-        color: #000;
-        box-shadow: 0 0 20px #f5a623, 0 0 30px #f5a623;
-    }
-
-    .cell.drawn {
-        background: #e94560;
-        color: #fff;
-        box-shadow: 0 0 20px #e94560, 0 0 30px #e94560;
-    }
-    
-    .cell.selected.drawn {
-        background: #5c67e8; /* A mix color for selected & drawn */
-    }
-
-    .cell.hit {
-        background: #00ff7f;
-        color: #000;
-        box-shadow: 0 0 25px #00ff7f, 0 0 40px #00ff7f;
-    }
-
-    button {
-        background: #f5a623;
-        border: none;
-        padding: 10px 20px;
-        color: #000;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: 0.3s;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    }
-
-    button.bet-btn {
-        padding: 5px 10px;
-        margin-left: 5px;
-    }
-
-    button:hover:not(:disabled) {
-        background: #ffba08;
-        transform: scale(1.05);
-    }
-    
-    button:disabled {
-        background: #444;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-        opacity: 0.6;
+    body {
+        font-family: 'Arial', sans-serif;
+        background: radial-gradient(circle at top left, #0d0d1f, #1a1a2e, #162447, #0d0d1f);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 20px;
+        min-height: 100vh;
+        margin: 0;
+        background-size: cover;
+        animation: bgPulse 10s infinite alternate;
     }
 
-    #php-money {
-        margin-bottom: 10px;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+    @keyframes bgPulse {
+        0% { background-position: top left; }
+        50% { background-position: center; }
+        100% { background-position: bottom right; }
+    }
 
-    #bet-input {
-        width: 60px;
-        padding: 2px 5px;
-        border-radius: 4px;
-        border: none;
-        font-size: 16px;
-        text-align: center;
-    }
+    h1 {
+        margin-bottom: 10px;
+        color: #f5a623;
+        text-shadow: 2px 2px 6px #000;
+    }
 
-    #hit-multiplier {
-        position: absolute;
-        top: 150px;
-        left: 20px;
-        background: linear-gradient(135deg, #162447, #0d0d1f);
-        padding: 10px;
-        border-radius: 5px;
-        color: #f5a623;
-        font-size: 14px;
-        line-height: 1.5;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.7);
-    }
+    #keno-board {
+        display: grid;
+        grid-template-columns: repeat(10, 50px);
+        grid-gap: 5px;
+        margin: 20px 0;
+    }
 
-    #results {
-        margin-top: 15px;
-        font-size: 16px;
-        color: #00ff7f;
-        font-weight: bold;
-        transition: transform 0.3s, opacity 0.5s;
-        opacity: 1;
-    }
+    .cell {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(145deg, #162447, #0d0d1f);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        user-select: none;
+        position: relative;
+        font-weight: bold;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    }
 
-    #results.error {
-        color: #ff4d4d;
-    }
-    
-    #game-over-screen {
-        display: none; /* Starts hidden */
-        text-align: center;
-        margin-top: 20px;
-        font-size: 24px;
-        color: #e94560;
-        font-weight: bold;
-    }
+    .cell.selected {
+        background: #f5a623;
+        color: #000;
+        box-shadow: 0 0 20px #f5a623, 0 0 30px #f5a623;
+    }
 
-    #controls {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
-        align-items: center;
-    }
+    .cell.drawn {
+        background: #e94560;
+        color: #fff;
+        box-shadow: 0 0 20px #e94560, 0 0 30px #e94560;
+    }
+
+    .cell.hit {
+        background: #00ff7f;
+        color: #000;
+        box-shadow: 0 0 25px #00ff7f, 0 0 40px #00ff7f;
+    }
+
+    button {
+        background: #f5a623;
+        border: none;
+        padding: 10px 20px;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: 0.3s;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    button:hover {
+        background: #ffba08;
+        transform: scale(1.05);
+    }
+
+    #php-money {
+        margin-bottom: 10px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #bet-input {
+        width: 60px;
+        padding: 2px 5px;
+        border-radius: 4px;
+        border: none;
+        font-size: 16px;
+    }
+
+    #hit-multiplier {
+        position: absolute;
+        top: 150px;
+        left: 20px;
+        background: linear-gradient(135deg, #162447, #0d0d1f);
+        padding: 10px;
+        border-radius: 5px;
+        color: #f5a623;
+        font-size: 14px;
+        line-height: 1.5;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+    }
+
+    #results {
+        margin-top: 15px;
+        font-size: 16px;
+        color: #00ff7f;
+        font-weight: bold;
+        transition: transform 0.3s, opacity 0.5s;
+        opacity: 1;
+    }
+
+    #results.error {
+        color: #ff4d4d;
+    }
+
+    #controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
 </style>
 </head>
 <body>
 
 <h1>cool keno game 🎲</h1>
-<div id="php-money">
-    money: <span id="money-display">100</span>
-    <span>
-        bet: <input type="number" id="bet-input" value="1" min="1">
-        <button id="bet-half" class="bet-btn">/2</button>
-        <button id="bet-double" class="bet-btn">x2</button>
-        <button id="bet-max" class="bet-btn">MAX</button>
-    </span>
-</div>
+<div id="php-money">money: 100 <span>bet: <input type="number" id="bet-input" value="10" min="1"></span></div>
 <div id="controls">
-    <span>Picks: <span id="pick-count">0</span>/10</span>
-    <button id="clear-picks-btn">Clear Picks</button>
+    <span>Picks: <span id="pick-count">0</span>/10</span>
+    <button id="clear-picks-btn">Clear Picks</button>
 </div>
 <div id="keno-board"></div>
 <div id="hit-multiplier">
-    hit multiplier (REAL Payouts):<br>
-    hit 0-2 = 0x (Loss)<br>
-    hit 3 = 2x<br>
-    hit 4 = 5x<br>
-    hit 5 = 15x<br>
-    hit 6 = 100x<br>
-    hit 7 = 750x<br>
-    hit 8 = 5,000x<br>
-    hit 9 = 15,000x<br>
-    hit 10 = 100,000x 💥
+    hit multiplier:<br>
+    hit 0-1 = 0x or 1x<br>
+    hit 2 = 2x<br>
+    hit 3 = 5x<br>
+    hit 4 = 10x<br>
+    hit 5 = 25x<br>
+    hit 6 = 30x<br>
+    hit 7 = 50x<br>
+    hit 8 = 75x<br>
+    hit 9 = 90x<br>
+    hit 10 = 100x
 </div>
 <button id="draw-btn">Draw Numbers</button>
 <div id="results"></div>
-<div id="game-over-screen">
-    GAME OVER, BRO!
-    <button id="play-again-btn">Play Again?</button>
-</div>
 
 <script>
 const board = document.getElementById('keno-board');
 const drawBtn = document.getElementById('draw-btn');
-const moneyDisplay = document.getElementById('money-display');
+const phpMoneyDiv = document.getElementById('php-money');
 const betInput = document.getElementById('bet-input');
 const resultsDiv = document.getElementById('results');
 const pickCountSpan = document.getElementById('pick-count');
 const clearBtn = document.getElementById('clear-picks-btn');
-const gameOverScreen = document.getElementById('game-over-screen');
-const playAgainBtn = document.getElementById('play-again-btn');
-
-// Bet buttons
-const betHalfBtn = document.getElementById('bet-half');
-const betDoubleBtn = document.getElementById('bet-double');
-const betMaxBtn = document.getElementById('bet-max');
 
 const totalNumbers = 80;
 let selectedNumbers = [];
 let money = 100;
 const maxPick = 10;
-const minBet = 1;
 
-// --- Global state for drawing/skipping ---
-let drawInterval = null;
-let currentDrawnNumbers = [];
-let currentBet = 0;
-
-// --- FIXED: Realistic, exponential payouts ---
 const payoutTable = {
-    0: 0,
-    1: 0,
-    2: 0,
-    3: 2,
-    4: 5,
-    5: 15,
-    6: 100,
-    7: 750,
-    8: 5000,
-    9: 15000,
-    10: 100000 
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 5,
+    4: 10,
+    5: 25,
+    6: 30,
+    7: 50,
+    8: 75,
+    9: 90,
+    10: 100
 };
 
 for (let i = 1; i <= totalNumbers; i++) {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    cell.textContent = i;
-    cell.addEventListener('click', () => toggleSelect(i, cell));
-    board.appendChild(cell);
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    cell.textContent = i;
+    cell.addEventListener('click', () => toggleSelect(i, cell));
+    board.appendChild(cell);
 }
 
 function showTempMessage(text, isError = false) {
-    resultsDiv.textContent = text;
-    resultsDiv.classList.toggle('error', isError);
-    resultsDiv.style.opacity = 1;
-    setTimeout(() => {
-        resultsDiv.style.opacity = 0;
-        resultsDiv.classList.remove('error');
-    }, 2000);
-}
-
-function updateMoney(amount) {
-    money += amount;
-    moneyDisplay.textContent = money;
-    updatePickCount();
-}
-
-function updateBetInput(newBet) {
-    let validBet = Math.max(minBet, Math.round(newBet));
-    betInput.value = Math.min(validBet, money);
-    updatePickCount();
+    resultsDiv.textContent = text;
+    resultsDiv.classList.toggle('error', isError);
+    resultsDiv.style.opacity = 1;
+    setTimeout(() => {
+        resultsDiv.style.opacity = 0;
+        resultsDiv.classList.remove('error');
+    }, 2000);
 }
 
 function updatePickCount() {
-    pickCountSpan.textContent = selectedNumbers.length;
-    let currentBetVal = parseInt(betInput.value) || 0;
-    
-    // Only disable draw button if a draw isn't already in progress
-    if (!drawInterval) {
-        drawBtn.disabled = selectedNumbers.length === 0 || currentBetVal > money || currentBetVal < minBet;
-    }
-    
-    betHalfBtn.disabled = (currentBetVal / 2) < minBet;
-    betDoubleBtn.disabled = (currentBetVal * 2) > money;
-    betMaxBtn.disabled = money < minBet;
-    
-    if (money < minBet && gameOverScreen.style.display !== 'block') {
-        showGameOver();
-    }
+    pickCountSpan.textContent = selectedNumbers.length;
+    drawBtn.disabled = selectedNumbers.length === 0 || parseInt(betInput.value) > money;
 }
 
 function toggleSelect(number, cell) {
-    if (drawInterval) return; // Prevent selection during draw
-
-    if (selectedNumbers.includes(number)) {
-        selectedNumbers = selectedNumbers.filter(n => n !== number);
-        cell.classList.remove('selected');
-    } else {
-        if (selectedNumbers.length < maxPick) {
-            selectedNumbers.push(number);
-            cell.classList.add('selected');
-        } else {
-            showTempMessage(`max ${maxPick} picks bro 😎`, true);
-        }
-    }
-    updatePickCount();
-}
-
-function resetBoard(clearSelections = true) {
-    document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected', 'drawn', 'hit'));
-    if (clearSelections) {
-        selectedNumbers = [];
+    if (selectedNumbers.includes(number)) {
+        selectedNumbers = selectedNumbers.filter(n => n !== number);
+        cell.classList.remove('selected');
     } else {
-        selectedNumbers.forEach(num => {
-            const cell = Array.from(document.querySelectorAll('.cell')).find(c => parseInt(c.textContent) === num);
-            if (cell) cell.classList.add('selected');
-        });
+        if (selectedNumbers.length < maxPick) {
+            selectedNumbers.push(number);
+            cell.classList.add('selected');
+        } else {
+            showTempMessage(`max ${maxPick} picks bro 😎`, true);
+        }
     }
-    resultsDiv.style.opacity = 0;
-}
-
-function showGameOver() {
-    drawBtn.style.display = 'none';
-    clearBtn.style.display = 'none';
-    document.getElementById('controls').style.display = 'none';
-    document.getElementById('php-money').style.display = 'none';
-    gameOverScreen.style.display = 'block';
-    resultsDiv.textContent = "GAME OVER! Time to reload the machine. 😭";
-    resultsDiv.classList.add('error');
-    resultsDiv.style.opacity = 1;
-}
-
-function playAgain() {
-    money = 100;
-    updateBetInput(10); 
-    moneyDisplay.textContent = money;
-
-    gameOverScreen.style.display = 'none';
-    drawBtn.style.display = 'block';
-    clearBtn.style.display = 'block';
-    document.getElementById('controls').style.display = 'flex';
-    document.getElementById('php-money').style.display = 'flex';
-
-    resetBoard(true);
     updatePickCount();
 }
 
-playAgainBtn.addEventListener('click', playAgain);
-
-// --- Quick Bet Button Handlers ---
-betHalfBtn.addEventListener('click', () => {
-    updateBetInput(parseInt(betInput.value) / 2);
-});
-
-betDoubleBtn.addEventListener('click', () => {
-    updateBetInput(parseInt(betInput.value) * 2);
-});
-
-betMaxBtn.addEventListener('click', () => {
-    updateBetInput(money);
-});
-
-betInput.addEventListener('input', () => {
-    let val = parseInt(betInput.value);
-    if (isNaN(val) || val < minBet) {
-        betInput.value = minBet;
-    }
+clearBtn.addEventListener('click', () => {
+    selectedNumbers = [];
+    document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
     updatePickCount();
 });
-
-
-function handleDrawClick() {
-    if (drawInterval) {
-        // If draw is happening, skip to end
-        skipDraw();
-    } else {
-        // Otherwise, start a new draw
-        drawNumbers();
-    }
-}
 
 function drawNumbers() {
-    currentBet = parseInt(betInput.value) || minBet;
-    if (currentBet > money) return;
+    let bet = parseInt(betInput.value) || 10;
+    if (selectedNumbers.length === 0) { showTempMessage('select some numbers first bro mf', true); return; }
+    if (selectedNumbers.length > maxPick) { showTempMessage(`you can only pick ${maxPick} numbers bro mf`, true); return; }
+    if (bet > money) { showTempMessage('bro mf not enough money to bet that', true); return; }
 
-    updateMoney(-currentBet);
-    
-    resetBoard(false); // Clear old results, keep selections
-
-    drawBtn.textContent = 'Skip ⏩';
-    drawBtn.disabled = false; // Make sure it's clickable to skip
-    clearBtn.disabled = true; // Disable clear during draw
-
-    currentDrawnNumbers = [];
-    while (currentDrawnNumbers.length < 20) {
-        let rand = Math.floor(Math.random() * totalNumbers) + 1;
-        if (!currentDrawnNumbers.includes(rand)) currentDrawnNumbers.push(rand);
-    }
-
-    let i = 0;
-    drawInterval = setInterval(() => {
-        if (i >= currentDrawnNumbers.length) {
-            // --- Draw is finished, now calculate ---
-            clearInterval(drawInterval);
-            drawInterval = null; // Mark draw as finished
-            calculateResults();
-            return;
-        }
-        
-        // Sequential drawing logic
-        const num = currentDrawnNumbers[i];
-        const cell = Array.from(document.querySelectorAll('.cell')).find(c => parseInt(c.textContent) === num);
-        cell.classList.add('drawn');
-        i++;
-    }, 200); // 200ms per number
-}
-
-function skipDraw() {
-    if (!drawInterval) return;
-
-    // Stop the animation
-    clearInterval(drawInterval);
-    drawInterval = null;
-
-    // Show all drawn numbers instantly (optional, but looks better)
-    currentDrawnNumbers.forEach(num => {
-        const cell = Array.from(document.querySelectorAll('.cell')).find(c => parseInt(c.textContent) === num);
-        if (cell) cell.classList.add('drawn');
-    });
-
-    // Jump to results
-    calculateResults();
-}
-
-function calculateResults() {
-    const hits = selectedNumbers.filter(n => currentDrawnNumbers.includes(n));
-            
-    // Highlight the hits and clear 'selected'/'drawn' classes
-    document.querySelectorAll('.cell.selected').forEach(c => c.classList.remove('selected'));
-    document.querySelectorAll('.cell.drawn').forEach(c => c.classList.remove('drawn'));
-    
-    hits.forEach(num => {
-        const cell = Array.from(document.querySelectorAll('.cell')).find(c => parseInt(c.textContent) === num);
-        cell.classList.add('hit');
-    });
-    
-    const multiplier = payoutTable[hits.length] || 0;
-    const winnings = currentBet * multiplier;
-            
-    updateMoney(winnings);
-
-    resultsDiv.textContent = `yo mf you hit ${hits.length} times! x${multiplier} = ${winnings} 💰`;
+    money -= bet;
+    phpMoneyDiv.childNodes[0].nodeValue = `money: ${money} `;
+    document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('drawn', 'selected', 'hit'));
+    resultsDiv.style.transform = 'scale(1)';
     resultsDiv.style.opacity = 1;
-    if (winnings > currentBet) {
-        resultsDiv.style.transform = 'scale(1.3)';
-    }
-            
-    setTimeout(() => { resultsDiv.style.opacity = 0; }, 4000); // Longer time to see results
-    selectedNumbers = []; // Clear picks for the next round
-    
-    // Re-enable controls
-    drawBtn.textContent = 'Draw Numbers';
-    clearBtn.disabled = false;
-    updatePickCount(); 
+
+    let drawnNumbers = [];
+    while (drawnNumbers.length < 20) {
+        let rand = Math.floor(Math.random() * totalNumbers) + 1;
+        if (!drawnNumbers.includes(rand)) drawnNumbers.push(rand);
+    }
+
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i >= drawnNumbers.length) {
+            clearInterval(interval);
+            const hits = selectedNumbers.filter(n => drawnNumbers.includes(n));
+            hits.forEach(num => {
+                const cell = Array.from(document.querySelectorAll('.cell')).find(c => parseInt(c.textContent) === num);
+                cell.classList.add('hit');
+            });
+            const multiplier = payoutTable[hits.length] || 0;
+            const winnings = bet * multiplier;
+            money += winnings;
+            phpMoneyDiv.childNodes[0].nodeValue = `money: ${money} `;
+            resultsDiv.textContent = `yo mf you hit ${hits.length} times! x${multiplier} = ${winnings} 💰`;
+            if (multiplier > 1) {
+                resultsDiv.style.transform = 'scale(1.3)';
+            }
+            setTimeout(() => { resultsDiv.style.opacity = 0; }, 3000);
+            selectedNumbers = [];
+            updatePickCount();
+            return;
+        }
+        const num = drawnNumbers[i];
+        const cell = Array.from(document.querySelectorAll('.cell')).find(c => parseInt(c.textContent) === num);
+        cell.classList.add('drawn');
+        i++;
+    }, 200);
 }
 
-// Main click listener
-drawBtn.addEventListener('click', handleDrawClick);
-
-// Initial setup
-updateBetInput(10);
+drawBtn.addEventListener('click', drawNumbers);
+betInput.addEventListener('input', updatePickCount);
 updatePickCount();
 </script>
 
